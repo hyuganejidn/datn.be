@@ -1,5 +1,7 @@
 import Topic from './topic.model'
+import Post from '../post/post.model'
 import { error, notFound, success } from '../../helpers/api'
+import { populatePost } from '../post/post.constants'
 
 export const index = async ({ querymen: { query, select, cursor } }, res) =>
   Topic.find(query, select, cursor)
@@ -10,9 +12,13 @@ export const index = async ({ querymen: { query, select, cursor } }, res) =>
     .then(success(res))
     .catch(error(res))
 
-
 export const create = async ({ body }, res) =>
-  Topic.create({ ...body })
+  Topic.create(body)
+    .then(success(res, 201))
+    .catch(error(res))
+
+export const createMany = async ({ body }, res) =>
+  Topic.insertMany(body)
     .then(success(res, 201))
     .catch(error(res))
 
@@ -32,4 +38,14 @@ export const destroy = ({ params }, res) =>
     .then(notFound(res))
     .then((topic) => topic.remove())
     .then(success(res, 204))
+    .catch(error(res))
+
+export const findPost = async ({ querymen: { query, select, cursor }, params }, res) =>
+  Post.find({ ...query, topic: params.id }, select, cursor)
+    .populate(populatePost)
+    .then(async posts => {
+      const total = await Post.countDocuments({ ...query, topic: params.id }).exec()
+      return { data: posts, total }
+    })
+    .then(success(res))
     .catch(error(res))

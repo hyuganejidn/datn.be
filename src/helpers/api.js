@@ -3,7 +3,6 @@ const logger = winston(__filename)
 
 export const success = (res, status) => (entity) => {
   if (entity) {
-    console.log(entity, "entity")
     res.status(status || 200).json(entity)
   }
   return null

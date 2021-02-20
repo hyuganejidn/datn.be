@@ -1,17 +1,25 @@
-export const populate = [
+export const populateComment = [
   {
     path: 'author',
     select: ['fullName', 'avatarUrl']
   },
+
   {
-    path: 'commentChildren',
-    select: ['author', 'content'],
-    populate: {
-      path: 'author',
-    }
+    path: 'commentsChild',
+    select: ['author', 'content', 'voteNum'],
+    populate: [
+      {
+        path: 'author',
+        select: ['fullName'],
+      },
+      {
+        path: 'userBeingReply',
+        select: ['fullName']
+      },
+    ]
   },
   {
     path: 'post',
-    select: ['id'],
+    select: ['title'],
   }
 ]

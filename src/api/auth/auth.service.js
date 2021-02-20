@@ -3,7 +3,7 @@ import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 import { MIN_PASSWORD, MAX_PASSWORD, TIME } from '../../constants'
-import User from '../user/user.model'
+import { User } from '../user/user.model'
 
 const validateRegister = (data) => {
   const errors = {}

@@ -1,14 +1,14 @@
 import mongoose from 'mongoose'
-import { populate } from './comment.constants'
+import { populateComment } from './comment.constants'
 
-const schema = mongoose.Schema(
+const CommentSchema = mongoose.Schema(
   {
     author: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
     post: { type: mongoose.Types.ObjectId, ref: 'Post', required: true },
     commentParent: { type: mongoose.Types.ObjectId, ref: 'Comment', default: null },
-    commentChildren: [{ type: mongoose.Types.ObjectId, ref: 'Comment' }],
+    userBeingReply: { type: mongoose.Types.ObjectId, default: null, ref: 'User' },
     content: { type: String, required: true },
-    like_num: { type: Number },
+    voteNum: { type: Number, default: 0 },
   },
   {
     timestamps: true,
@@ -24,14 +24,26 @@ const schema = mongoose.Schema(
   }
 )
 
-schema.methods.populateComment = async function () {
-  return await this.populate(populate).execPopulate()
+CommentSchema.virtual('commentsChild', {
+  ref: 'Comment',
+  localField: '_id',
+  foreignField: 'commentParent',
+})
+
+CommentSchema.methods.populateComment = async function () {
+  return await this.populate(populateComment).execPopulate()
 }
 
-// schema.methods.populateAuthor = async function () {
+CommentSchema.pre('remove', async function (next) {
+  await this.model('VoteComment').remove({ comment: this._id })
+  await this.model('Comment').remove({ commentParent: this._id })
+  next()
+})
+
+// CommentSchema.methods.populateAuthor = async function () {
 //   const result = await this.populate('author').execPopulate()
 //   return result
 // }
 
-const model = mongoose.model('Comment', schema)
+const model = mongoose.model('Comment', CommentSchema)
 export default model

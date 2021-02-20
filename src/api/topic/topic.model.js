@@ -6,7 +6,7 @@ import mongooseKeywords from 'mongoose-keywords'
 const TopicSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
-    slug: { type: String, required: true },
+    slug: { type: String, required: true, unique: true, lowercase: true },
   },
   {
     versionKey: false,

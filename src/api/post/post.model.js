@@ -6,15 +6,15 @@ const classifies = ['forum', 'blog']
 const PostSchema = mongoose.Schema(
   {
     author: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
+    topic: { type: mongoose.Types.ObjectId, ref: 'Topic' },
+    blog: { type: mongoose.Types.ObjectId, ref: 'Blog' },
     classify: { type: String, enum: classifies, default: 'forum' },
-    topic: { type: mongoose.Types.ObjectId, ref: 'Topic', default: null },
-    blog: { type: mongoose.Types.ObjectId, ref: 'Blog', default: null },
     avatar: { type: String, default: "" },
     title: { type: String, required: true },
     content: { type: String, required: true },
-    vote_num: { type: Number, default: 0 },
-    view_num: { type: Number, default: 0 },
-    comment_num: { type: Number, default: 0 },
+    voteNum: { type: Number, default: 0 },
+    viewNum: { type: Number, default: 0 },
+    commentNum: { type: Number, default: 0 },
   },
   {
     timestamps: true,

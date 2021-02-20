@@ -1,10 +1,11 @@
 type Roles = 'admin' | 'user'
 type Classify = 'Forum' | 'Blog'
 
-type Topic = {
-  [key: string]: string
-}
 
+interface Topic {
+  name: string
+  slug: string
+}
 interface User {
   role: Roles
   username: string
@@ -22,9 +23,9 @@ interface Post {
 
   title: string
   content: string
-  vote_num: number
-  comment_num: number
-  view_num: number
+  voteNum: number
+  commentNum: number
+  viewNum: number
 }
 
 interface Blog {
@@ -33,16 +34,27 @@ interface Blog {
   description: string
   slug: string
   info: string
-  follow_num: number
-  post_num: number
+  followNum: number
+  postNum: number
 }
 
 interface Comment {
   author: User
   post: Post
-  commentChildren: Comment[]
   commentParent: Comment
 
   like_num: number
   content: string
+}
+
+interface VoteComment {
+  comment: Comment
+  user: User
+  vote: number
+}
+
+interface VotePost {
+  comment: Post
+  user: User
+  vote: number
 }

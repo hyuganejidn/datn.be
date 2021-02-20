@@ -3,6 +3,9 @@ import bcryptjs from 'bcryptjs'
 
 import { MIN_PASSWORD, MAX_PASSWORD } from '../../constants'
 import { hashPassword } from '../auth/auth.service'
+import Blog from '../blog/blog.model'
+import { VoteComment, VotePost } from './user.model'
+import { populateBlog } from '../blog/blog.constants'
 
 export const verifyResetPassword = async (payload, data, user) => {
   const { new_password, new_password_confirm, password } = payload
@@ -49,4 +52,63 @@ export const verifyNewPassword = (password, new_password, new_password_confirm) 
   }
 
   return errors
+}
+
+export const handleFollowerBlog = async (user, blogId) => {
+  try {
+    const blogsOfUser = await Blog.find({ author: user.id })
+    if (blogsOfUser.some(blog => blog.id === blogId)) {
+      throw { errors: { message: 'Not follow blog of yourself' } }
+    }
+
+    const indexBlog = user.blogsFollowing.indexOf(blogId)
+
+    if (~indexBlog) await user.updateOne({ $pull: { blogsFollowing: blogId } })
+    else await user.updateOne({ $push: { blogsFollowing: blogId } })
+
+    return indexBlog === -1 ? 1 : -1
+  } catch (error) {
+    throw { errors: error }
+  }
+}
+
+export const getPostsVoted = async (userId, type) => {
+  try {
+    const votePosts = await VotePost.find({ user: userId })
+      .populate('post', 'classify')
+
+    const votePostObj = votePosts
+      .filter(item => item.post.classify === type)
+      .reduce((cur, acc) => ({ ...cur, [acc.post.id]: acc.vote }), {})
+
+    return votePostObj
+  } catch (error) {
+    throw { errors: error }
+  }
+}
+
+export const getCommentsVoted = async (userId, postId) => {
+  try {
+    const voteComment = await VoteComment.find({ user: userId }).populate('comment', 'post')
+
+    const voteCommentObj = voteComment
+      .filter(item => item.comment.post + "" === postId)
+      .reduce((cur, acc) => ({ ...cur, [acc.comment._id]: acc.vote }), {})
+
+    return voteCommentObj
+  } catch (error) {
+    throw { errors: error }
+  }
+}
+
+export const getBlogsOfUser = async ({ query, select, cursor }, userId) => {
+  try {
+    console.log({ ...query, author: userId })
+    const blogs = await Blog.find({ ...query, author: userId }, select, cursor).populate(populateBlog)
+    const total = await Blog.countDocuments({ ...query, author: userId }).exec()
+
+    return { data: blogs, total }
+  } catch (error) {
+    throw { errors: error }
+  }
 }
