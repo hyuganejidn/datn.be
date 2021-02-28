@@ -5,7 +5,7 @@ import { index, show, create, update, destroy, votePost, likePost } from './post
 import { authenticate } from '../../middleware/authenticate'
 const router = new Router()
 
-router.get('/', query(), index)
+router.get('/', query({ classify: { paths: ['classify']} }), index)
 router.get('/:id', show)
 router.put('/:id', authenticate(['admin']), update)
 router.post('/', authenticate(['admin']), create)

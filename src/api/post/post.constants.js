@@ -9,5 +9,6 @@ export const populatePost = [
   },
   {
     path: 'topic',
+    select: ['name', 'slug'],
   }
 ]

@@ -5,7 +5,9 @@ import { error, notFound, success } from '../../helpers/api'
 import { populatePost } from './post.constants'
 import { handleVotePost, handleUpNumPost } from './post.service'
 
-export const index = async ({ querymen: { query, select, cursor } }, res) =>
+export const index = async ({ querymen: { query, select, cursor }, params }, res) => {
+  // const _query = params.classify ? { ...query, classify: params.classify } : query
+  console.log(query, select, cursor, params)
   Post.find(query, select, cursor)
     .populate(populatePost)
     .then(async post => {
@@ -14,6 +16,7 @@ export const index = async ({ querymen: { query, select, cursor } }, res) =>
     })
     .then(success(res))
     .catch(error(res))
+}
 
 export const create = async ({ body, user }, res) =>
   Post.create({ ...body, author: user.id })
