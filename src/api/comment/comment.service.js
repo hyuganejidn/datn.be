@@ -1,6 +1,6 @@
 import Comment from './comment.model'
 import Post from '../post/post.model'
-import { VoteComment } from '../user/user.model'
+import { VoteComment, LikeComment } from '../user/user.model'
 // import { User } from '../user/user.model'
 
 export const createComment = async (body, userId) => {
@@ -48,8 +48,29 @@ export const handleVoteComment = async (commentId, userId, { vote }) => {
       comment.voteNum += vote
     }
     comment.save()
-    return { success: true }
+    return { success: true, vote: comment.voteNum }
   } catch (error) {
     throw { message: error }
   }
 }
+
+export const handleLikeComment = async (commentId, userId) => {
+  try {
+    const comment = await Comment.findById(commentId)
+    const likeComment = await LikeComment.findOne({ user: userId, comment: commentId })
+
+    if (likeComment) {
+      likeComment.remove()
+      comment.voteNum -= 1
+    } else {
+      await LikeComment.create({ comment: commentId, user: userId })
+      comment.voteNum += 1
+    }
+
+    comment.save()
+    return { success: true, vote: comment.voteNum }
+  } catch (error) {
+    throw { message: error }
+  }
+}
+

@@ -74,6 +74,34 @@ const VotePostSchema = mongoose.Schema({
   }
 })
 
+const LikePostSchema = mongoose.Schema({
+  post: { type: mongoose.Types.ObjectId, ref: 'Post', required: true },
+  user: { type: mongoose.Types.ObjectId, ref: 'User', required: true },
+}, {
+  versionKey: false,
+  toJSON: {
+    transform: (obj, ret) => {
+      delete ret._id
+      delete ret.user
+    }
+  }
+})
+
+const LikeCommentSchema = mongoose.Schema({
+  comment: { type: mongoose.Types.ObjectId, ref: 'Comment', required: true },
+  user: { type: mongoose.Types.ObjectId, ref: 'User', required: true },
+}, {
+  versionKey: false,
+  toJSON: {
+    transform: (obj, ret) => {
+      delete ret._id
+      delete ret.user
+    }
+  }
+})
+
 export const User = mongoose.model('User', UserSchema)
 export const VotePost = mongoose.model('VotePost', VotePostSchema)
+export const LikePost = mongoose.model('LikePost', LikePostSchema)
 export const VoteComment = mongoose.model('VoteComment', VoteCommentSchema)
+export const LikeComment = mongoose.model('LikeComment', LikeCommentSchema)

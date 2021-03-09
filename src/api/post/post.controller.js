@@ -1,13 +1,13 @@
 import Post from './post.model'
-import { User } from '../user/user.model'
+import Comment from '../comment/comment.model'
+import Topic from '../topic/topic.model'
 
 import { error, notFound, success } from '../../helpers/api'
-import { populatePost } from './post.constants'
-import { handleVotePost, handleUpNumPost } from './post.service'
+import { populatePost, populatePostComment } from './post.constants'
+import { handleVotePost, handleUpPostNumber, handleLikePost } from './post.service'
+import { populateComment } from '../comment/comment.constants'
 
-export const index = async ({ querymen: { query, select, cursor }, params }, res) => {
-  // const _query = params.classify ? { ...query, classify: params.classify } : query
-  console.log(query, select, cursor, params)
+export const index = async ({ querymen: { query, select, cursor }, params }, res) =>
   Post.find(query, select, cursor)
     .populate(populatePost)
     .then(async post => {
@@ -16,16 +16,26 @@ export const index = async ({ querymen: { query, select, cursor }, params }, res
     })
     .then(success(res))
     .catch(error(res))
-}
 
-export const create = async ({ body, user }, res) =>
-  Post.create({ ...body, author: user.id })
-    .then(post => handleUpNumPost(post))
+
+export const create = async ({ body, user }, res) => {
+  console.log(body)
+  let data = { ...body, author: user.id }
+  if (body.classify === 'forum' && body.topic) {
+    const topic = await Topic.findOne({ slug: body.topic })
+    console.log(topic)
+    data.topic = topic.id
+  }
+  console.log(data, '123')
+  Post.create(data)
+    .then(post => handleUpPostNumber(post))
     .then(success(res, 201))
     .catch(error(res))
+}
 
 export const show = ({ params }, res) =>
   Post.findById(params.id)
+    .populate(populatePost)
     .then(notFound(res))
     .then(post => post.set({ viewNum: ++post.viewNum }).save())
     .then(success(res))
@@ -43,9 +53,29 @@ export const destroy = ({ params }, res) =>
     .then(success(res, 204))
     .catch(error(res))
 
+export const listComment = ({ params }, res) =>
+  Comment.find({ commentParent: null, userBeingReply: null, post: params.id })
+    .populate(populateComment)
+    .then(comments => ({ data: comments }))
+    .then(success(res))
+    .catch(error(res))
+
+export const findPostsFollowed = ({ querymen: { query, select, cursor }, user }, res) =>
+  Post.find({ ...query, 'blog': { $in: user.blogsFollowing } }, select, cursor)
+    .populate(populatePost)
+    .then(async blogs => {
+      const total = await Post.countDocuments({ ...query, 'blog': { $in: user.blogsFollowing } }).exec()
+      return { data: blogs, total }
+    })
+    .then(success(res))
+    .catch(error(res))
+
 export const votePost = ({ params, body, user }, res) =>
   handleVotePost(params.id, user.id, body)
     .then(success(res))
     .catch(error(res))
 
-export const likePost = ({ params, body, user }) => console.log(params, body)
+export const likePost = ({ params, body, user }, res) =>
+  handleLikePost(params.id, user.id)
+    .then(success(res))
+    .catch(error(res))

@@ -3,14 +3,20 @@ export const populateComment = [
     path: 'author',
     select: ['fullName', 'avatarUrl']
   },
-
+  {
+    path: 'userBeingReply',
+    select: ['fullName']
+  },
   {
     path: 'commentsChild',
-    select: ['author', 'content', 'voteNum'],
     populate: [
       {
+        path: 'post',
+        select: ['title'],
+      },
+      {
         path: 'author',
-        select: ['fullName'],
+        select: ['fullName', 'avatarUrl'],
       },
       {
         path: 'userBeingReply',

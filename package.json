@@ -26,6 +26,7 @@
     "mongoose": "^5.11.15",
     "mongoose-keywords": "^0.4.1",
     "morgan": "^1.10.0",
+    "multer": "^1.4.2",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "querymen": "^2.1.4",

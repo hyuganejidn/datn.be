@@ -1,11 +1,11 @@
 import Blog from '../blog/blog.model'
 import Post from './post.model'
-import { VotePost } from '../user/user.model'
+import { VotePost, LikePost } from '../user/user.model'
 
 export const handleUpPostNumber = async (post) => {
   if (post.blog && post.classify === 'blog') {
     const blog = await Blog.findById(post.blog)
-    console.log(blog)
+
     if (blog) blog.set({ postNum: ++blog.postNum }).save()
   }
   return post
@@ -31,7 +31,27 @@ export const handleVotePost = async (postId, userId, { vote }) => {
       post.voteNum += vote
     }
     post.save()
-    return { success: true }
+    return { success: true, vote: post.voteNum }
+  } catch (error) {
+    throw { message: error }
+  }
+}
+
+export const handleLikePost = async (postId, userId) => {
+  try {
+    const post = await Post.findById(postId)
+    const likePost = await LikePost.findOne({ user: userId, post: postId })
+
+    if (likePost) {
+      likePost.remove()
+      post.voteNum -= 1
+    } else {
+      await LikePost.create({ post: post, user: userId })
+      post.voteNum += 1
+    }
+
+    post.save()
+    return { success: true, vote: post.voteNum }
   } catch (error) {
     throw { message: error }
   }

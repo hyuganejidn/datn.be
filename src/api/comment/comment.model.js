@@ -18,7 +18,7 @@ const CommentSchema = mongoose.Schema(
       transform: (obj, ret) => {
         delete ret._id
         delete ret.keywords
-        delete ret.commentParent
+        // delete ret.commentParent
       }
     }
   }
@@ -37,6 +37,7 @@ CommentSchema.methods.populateComment = async function () {
 CommentSchema.pre('remove', async function (next) {
   await this.model('VoteComment').remove({ comment: this._id })
   await this.model('Comment').remove({ commentParent: this._id })
+  await this.model('Post').updateOne({ _id: this.post }, { $inc: { commentNum: -1 } })
   next()
 })
 

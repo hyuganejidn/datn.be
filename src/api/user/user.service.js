@@ -4,11 +4,11 @@ import bcryptjs from 'bcryptjs'
 import { MIN_PASSWORD, MAX_PASSWORD } from '../../constants'
 import { hashPassword } from '../auth/auth.service'
 import Blog from '../blog/blog.model'
-import { VoteComment, VotePost } from './user.model'
+import { VoteComment, VotePost, LikePost, LikeComment } from './user.model'
 import { populateBlog } from '../blog/blog.constants'
 
 export const verifyResetPassword = async (payload, data, user) => {
-  const { new_password, new_password_confirm, password } = payload
+  const { new_password, new_passwordConfirm, password } = payload
 
   const isSelfUpdate = user.role === 'user' && user.id !== data.id
   if (isSelfUpdate) throw {
@@ -20,7 +20,7 @@ export const verifyResetPassword = async (payload, data, user) => {
   const isPasswordCorrect = await bcryptjs.compare(password, data.password)
   if (!isPasswordCorrect) throw { password: 'Password is incorrect.' }
 
-  const errors = verifyNewPassword(password, new_password, new_password_confirm)
+  const errors = verifyNewPassword(password, new_password, new_passwordConfirm)
   if (Object.keys(errors).length) throw errors
 
   const securePassword = await hashPassword(new_password)
@@ -30,7 +30,7 @@ export const verifyResetPassword = async (payload, data, user) => {
   }
 }
 
-export const verifyNewPassword = (password, new_password, new_password_confirm) => {
+export const verifyNewPassword = (password, new_password, new_passwordConfirm) => {
   const errors = {}
   if (!new_password) {
     errors.new_password = 'New password field is required.'
@@ -47,8 +47,8 @@ export const verifyNewPassword = (password, new_password, new_password_confirm) 
       errors.new_password = `Password need at least ${MIN_PASSWORD} character and less than ${MAX_PASSWORD} character`
     }
   }
-  if (!new_password_confirm || !validator.equals(new_password_confirm, new_password)) {
-    errors.new_password_confirm = 'New password confirm is not match.'
+  if (!new_passwordConfirm || !validator.equals(new_passwordConfirm, new_password)) {
+    errors.new_passwordConfirm = 'New password confirm is not match.'
   }
 
   return errors
@@ -74,12 +74,18 @@ export const handleFollowerBlog = async (user, blogId) => {
 
 export const getPostsVoted = async (userId, type) => {
   try {
-    const votePosts = await VotePost.find({ user: userId })
-      .populate('post', 'classify')
+    let vote
+    if (type === 'forum') {
+      vote = await VotePost.find({ user: userId })
+        .populate('post', 'classify')
+    } else {
+      vote = await LikePost.find({ user: userId })
+        .populate('post', 'classify')
+    }
 
-    const votePostObj = votePosts
+    const votePostObj = vote
       .filter(item => item.post.classify === type)
-      .reduce((cur, acc) => ({ ...cur, [acc.post.id]: acc.vote }), {})
+      .reduce((cur, acc) => ({ ...cur, [acc.post.id]: type === 'forum' ? acc.vote : 1 }), {})
 
     return votePostObj
   } catch (error) {
@@ -87,13 +93,18 @@ export const getPostsVoted = async (userId, type) => {
   }
 }
 
-export const getCommentsVoted = async (userId, postId) => {
+export const getCommentsVoted = async (userId, postId, type) => {
   try {
-    const voteComment = await VoteComment.find({ user: userId }).populate('comment', 'post')
+    let vote
+    if (type === 'forum') {
+      vote =  await VoteComment.find({ user: userId }).populate('comment', 'post')
+    } else {
+      vote = await LikeComment.find({ user: userId }).populate('comment', 'post')
+    }
 
-    const voteCommentObj = voteComment
+    const voteCommentObj = vote
       .filter(item => item.comment.post + "" === postId)
-      .reduce((cur, acc) => ({ ...cur, [acc.comment._id]: acc.vote }), {})
+      .reduce((cur, acc) => ({ ...cur, [acc.comment._id]: type === 'forum' ? acc.vote : 1 }), {})
 
     return voteCommentObj
   } catch (error) {

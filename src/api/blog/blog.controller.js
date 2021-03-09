@@ -3,7 +3,7 @@ import { User } from '../user/user.model'
 import Post from '../post/post.model'
 import { error, notFound, success } from '../../helpers/api'
 import { populatePost } from '../post/post.constants'
-import { getUsersFollowedBlog } from './blog.service'
+import { getUsersFollowedBlog, verifyBeforeCreate } from './blog.service'
 import { populateBlog } from './blog.constants'
 
 export const index = async ({ querymen: { query, select, cursor } }, res) =>
@@ -18,13 +18,15 @@ export const index = async ({ querymen: { query, select, cursor } }, res) =>
 
 
 export const create = async ({ body, user }, res,) =>
-  Blog.create({ ...body, author: user.id })
+  verifyBeforeCreate(body, user.id)
+    .then(async data => await Blog.create(data))
     .then(success(res, 201))
     .catch(error(res))
 
 
 export const show = ({ params }, res) =>
-  Blog.findById(params.id)
+  Blog.findOne({ slug: params.slug })
+    .populate(populateBlog)
     .then(notFound(res))
     .then(success(res))
     .catch(error(res))
@@ -61,3 +63,13 @@ export const findPost = async ({ querymen: { query, select, cursor }, params }, 
     .then(success(res))
     .catch(error(res))
 
+
+export const findBlogsUserFollowed = ({ querymen: { query, select, cursor }, user }, res) =>
+  Blog.find({ ...query, '_id': { $in: user.blogsFollowing } }, select, cursor)
+    .populate(populateBlog)
+    .then(async blogs => {
+      const total = await Blog.countDocuments({ ...query, '_id': { $in: user.blogsFollowing } }).exec()
+      return { data: blogs, total }
+    })
+    .then(success(res))
+    .catch(error(res))

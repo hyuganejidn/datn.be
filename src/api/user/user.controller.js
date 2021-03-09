@@ -62,7 +62,7 @@ export const findPostsVoted = ({ user, query }, res) =>
     .catch(error(res))
 
 export const findCommentsVoted = ({ user, query }, res) =>
-  getCommentsVoted(user.id, query.post)
+  getCommentsVoted(user.id, query.post, query.type)
     .then(success(res))
     .catch(error(res))
 

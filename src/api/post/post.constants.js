@@ -1,3 +1,5 @@
+import { populateComment } from "../comment/comment.constants";
+
 export const populatePost = [
   {
     path: 'author',
@@ -5,10 +7,21 @@ export const populatePost = [
   },
   {
     path: 'blog',
-    select: ['title'],
+    select: ['title', 'slug', 'avatar'],
+    populate: [
+      {
+        path: 'author',
+        select: ['fullName'],
+      },
+    ]
   },
   {
     path: 'topic',
     select: ['name', 'slug'],
-  }
+  },
 ]
+
+export const populatePostComment = [...populatePost, {
+  path: 'comments',
+  populate: populateComment
+}]

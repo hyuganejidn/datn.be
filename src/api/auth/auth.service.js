@@ -7,7 +7,7 @@ import { User } from '../user/user.model'
 
 const validateRegister = (data) => {
   const errors = {}
-  const { fullName, username, password, password_confirm } = data;
+  const { fullName, username, password, passwordConfirm } = data;
 
   if (!fullName) errors.fullName = 'Full name field is required.'
 
@@ -26,8 +26,8 @@ const validateRegister = (data) => {
     }
   }
 
-  if (!password_confirm || !validator.equals(password, password_confirm)) {
-    errors.password_confirm = 'Confirm password is not match.'
+  if (!passwordConfirm || !validator.equals(password, passwordConfirm)) {
+    errors.passwordConfirm = 'Confirm password is not match.'
   }
   return errors
 }
@@ -72,6 +72,7 @@ const verifyBeforeCreating = async (payload) => {
   if (user) throw { username: 'Username is already exists.' }
 
   const securePassword = await hashPassword(password)
+  console.log(typeof securePassword, securePassword.length, '-----------------------------------')
   return { ...payload, password: securePassword }
 }
 
@@ -81,7 +82,7 @@ const verifyUserLogin = async (payload) => {
 
   const { username, password } = payload
   const user = await User.findOne({ username })
-  if (!user) throw { user: 'Username is incorrect.' }
+  if (!user) throw { username: 'Username is incorrect.' }
 
   const isPasswordCorrect = await bcryptjs.compare(password, user.password)
   if (!isPasswordCorrect) throw { password: 'Password is incorrect.' }
