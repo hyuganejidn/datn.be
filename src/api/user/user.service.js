@@ -82,10 +82,11 @@ export const getPostsVoted = async (userId, type) => {
       vote = await LikePost.find({ user: userId })
         .populate('post', 'classify')
     }
-
     const votePostObj = vote
-      .filter(item => item.post.classify === type)
+      .filter(item => item.post && item.post.classify === type)
       .reduce((cur, acc) => ({ ...cur, [acc.post.id]: type === 'forum' ? acc.vote : 1 }), {})
+
+
 
     return votePostObj
   } catch (error) {
@@ -97,7 +98,7 @@ export const getCommentsVoted = async (userId, postId, type) => {
   try {
     let vote
     if (type === 'forum') {
-      vote =  await VoteComment.find({ user: userId }).populate('comment', 'post')
+      vote = await VoteComment.find({ user: userId }).populate('comment', 'post')
     } else {
       vote = await LikeComment.find({ user: userId }).populate('comment', 'post')
     }

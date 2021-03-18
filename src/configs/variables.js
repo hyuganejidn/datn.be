@@ -13,6 +13,7 @@ const variables = {
     ip: process.env.IP || '0.0.0.0',
     apiRoot: process.env.API_ROOT || '/api' + API_PREFIX,
     jwtSecret: getEnv('JWT_SECRET'),
+    uri: process.env.HOST + ':' + process.env.PORT,
     mongo: {
       options: {
         db: {

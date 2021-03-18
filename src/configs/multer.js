@@ -2,7 +2,7 @@ import multer from 'multer'
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, './public/images'),
-  filename: (req, file, cb) => cb(null, `${Date.now()}.${file.mimetype.split('/')[1]}`)
+  filename: (req, file, cb) => cb(null, `${file.originalname || ''}_${Date.now()}.${file.mimetype.split('/')[1]}`)
 })
 
 const typeFileAccept = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/svg']

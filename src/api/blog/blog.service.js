@@ -13,9 +13,9 @@ export const getUsersFollowedBlog = async (blogId) => {
 export const verifyBeforeCreate = async (body, author) => {
   try {
     const errors = {}
-    const { slug, title, destination, avatar } = body
+    const { slug, title, description, avatar } = body
     if (!title) errors.title = 'Field is required'
-    if (!destination) errors.destination = 'Field is required'
+    if (!description) errors.description = 'Field is required'
     if (!avatar) errors.avatar = 'Field is required'
     if (!slug) errors.slug = 'Field is required'
 

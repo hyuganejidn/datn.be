@@ -1,6 +1,7 @@
 import Post from './post.model'
 import Comment from '../comment/comment.model'
 import Topic from '../topic/topic.model'
+import Blog from '../blog/blog.model'
 
 import { error, notFound, success } from '../../helpers/api'
 import { populatePost, populatePostComment } from './post.constants'
@@ -19,14 +20,17 @@ export const index = async ({ querymen: { query, select, cursor }, params }, res
 
 
 export const create = async ({ body, user }, res) => {
-  console.log(body)
   let data = { ...body, author: user.id }
   if (body.classify === 'forum' && body.topic) {
     const topic = await Topic.findOne({ slug: body.topic })
     console.log(topic)
     data.topic = topic.id
   }
-  console.log(data, '123')
+  if (body.classify === 'blog' && body.blog) {
+    const blog = await Blog.findOne({ _id: body.blog })
+    data.blog = blog.id
+  }
+
   Post.create(data)
     .then(post => handleUpPostNumber(post))
     .then(success(res, 201))

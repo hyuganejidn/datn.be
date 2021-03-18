@@ -6,7 +6,7 @@ import { authenticate } from '../../middleware/authenticate'
 const router = new Router()
 
 router.get('/', query(), index)
-router.get('/users_followed', authenticate(), query(), findBlogsUserFollowed)
+router.get('/blogs_followed', authenticate(), query(), findBlogsUserFollowed)
 router.get('/:slug', show)
 
 router.put('/:id', authenticate(), update)

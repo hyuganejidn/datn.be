@@ -9,7 +9,7 @@ import {
 import { authenticate } from '../../middleware/authenticate'
 const router = new Router()
 
-router.post('/', authenticate(['admin']), upload.array('imgs'), create)
+router.post('/', authenticate(), upload.array('imgs'), create)
 
 
 export default router

@@ -1,6 +1,6 @@
 import Image from "./image.model";
 import { error, success } from "../../helpers/api";
-
+import { uri } from '../../configs/variables'
 
 // export const index = async ({ querymen: { query, select, cursor } }, res) =>
 //   Topic.find(query, select, cursor)
@@ -12,7 +12,7 @@ import { error, success } from "../../helpers/api";
 //     .catch(error(res))
 
 export const create = ({ files }, res) => {
-  const paths = files.map(file => ({ path: file.path }))
+  const paths = files.map(file => ({ path: uri + '/' + file.path }))
   console.log(files)
   Image.insertMany(paths).then(success(res, 201)).catch(error(res))
 }

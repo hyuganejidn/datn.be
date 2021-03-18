@@ -1,10 +1,12 @@
 
 import { User, VotePost } from './user.model'
 import Blog from '../blog/blog.model'
+import Post from '../post/post.model'
 
 import { error, notFound, success } from '../../helpers/api'
 import { verifyResetPassword, getPostsVoted, getCommentsVoted, handleFollowerBlog, getBlogsOfUser } from './user.service'
 import { populateUser } from './user.constants'
+import { populatePost } from '../post/post.constants'
 
 export const index = ({ querymen: { query, select, cursor } }, res) =>
   User.find(query, select, cursor)
@@ -70,3 +72,11 @@ export const findBlogs = ({ querymen, params, user }, res) =>
   getBlogsOfUser(querymen, params.id === 'me' ? user.id : params.id)
     .then(success(res))
     .catch(error(res))
+
+export const findPostsForum = ({ querymen: { query, select, cursor }, params, user }, res) =>
+  Post.find({ ...query, author: params.id, classify: 'forum' }, select, cursor)
+    .populate(populatePost)
+    .then(success(res))
+    .catch(error(res))
+
+

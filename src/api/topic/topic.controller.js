@@ -37,6 +37,13 @@ export const destroy = ({ params }, res) =>
     .then(success(res, 204))
     .catch(error(res))
 
+export const destroyMany = ({ params }, res) =>
+  Topic.remove({})
+    .then(notFound(res))
+    // .then((topic) => topic.remove())
+    .then(success(res, 204))
+    .catch(error(res))
+
 export const findPosts = ({ querymen, params }, res) =>
   getPosts(querymen, params.slug)
     .then(success(res))

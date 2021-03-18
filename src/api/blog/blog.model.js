@@ -7,7 +7,7 @@ const BlogSchema = mongoose.Schema(
   {
     author: { type: mongoose.Types.ObjectId, required: true, ref: 'User' },
     title: { type: String, required: true },
-    destination: { type: String, required: true },
+    description: { type: String, required: true },
     avatar: { type: String, required: true },
     cover: { type: String, default: "" },
     slug: { type: String, required: true, unique: true, lowercase: true },
