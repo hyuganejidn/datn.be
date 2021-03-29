@@ -1,8 +1,8 @@
 import Comment from './comment.model'
-import { populateComment } from './comment.constants'
+import { populateComment, _populateComment } from './comment.constants'
 
 import { error, notFound, success } from '../../helpers/api'
-import { createComment, handleLikeComment, handleVoteComment } from './comment.service'
+import { createComment, handleLikeComment, handleRemove, handleVoteComment } from './comment.service'
 
 export const index = (req, res) =>
   Comment.find({ commentParent: null, userBeingReply: null })
@@ -18,12 +18,10 @@ export const getById = ({ params }, res) =>
     .then(success(res))
     .catch(error(res))
 
-
 export const create = async ({ body, user }, res) =>
   createComment(body, user.id)
     .then(success(res))
     .catch(error(res))
-
 
 export const vote = ({ params, body, user }, res) =>
   handleVoteComment(params.id, user.id, body)
@@ -43,13 +41,14 @@ export const update = async ({ params, body }, res) =>
 
 export const destroy = async ({ params, user }, res) =>
   Comment.findOne({ _id: params.id, author: user.id })
+    .populate(populateComment)
     .then(notFound(res))
-    .then(comment => comment.remove())
-    .then(success(res, 204))
+    .then(handleRemove)
+    .then(success(res, 200))
     .catch(error(res))
 
 
-export const removeAll = async (req, res) =>
+export const deleteMany = async (req, res) =>
   Comment.remove({})
     .then(success(res, 204))
     .catch(error(res))

@@ -1,7 +1,6 @@
 import mongoose from 'mongoose'
 import mongooseKeywords from 'mongoose-keywords'
-
-// import { populate } from './comment.constants'
+import { populateBlog } from './blog.constants'
 
 const BlogSchema = mongoose.Schema(
   {
@@ -40,11 +39,19 @@ const BlogSchema = mongoose.Schema(
 // BlogSchema.methods.populateComment = async function () {
 //   return await this.populate(populate).execPopulate()
 // }
-
+BlogSchema.pre('remove', async function (next) {
+  await this.model('Post').remove({ blog: this._id })
+  next()
+})
 // BlogSchema.methods.populateAuthor = async function () {
 //   const result = await this.populate('author').execPopulate()
 //   return result
 // }
+
+BlogSchema.methods.populateBlog = async function () {
+  return await this.populate(populateBlog).execPopulate()
+}
+
 BlogSchema.plugin(mongooseKeywords, { paths: ['title', 'slug'] })
 const model = mongoose.model('Blog', BlogSchema)
 export default model

@@ -34,6 +34,7 @@ export const show = ({ params }, res) =>
 
 export const update = async ({ params, body }, res) => {
   Blog.findByIdAndUpdate(params.id, body, { new: true, })
+    .then(blog => blog.populateBlog())
     .then(success(res))
     .catch(error(res))
 }
@@ -72,4 +73,9 @@ export const findBlogsUserFollowed = ({ querymen: { query, select, cursor }, use
       return { data: blogs, total }
     })
     .then(success(res))
+    .catch(error(res))
+
+export const deleteMany = (req, res) =>
+  Blog.remove({})
+    .then(success(res, 204))
     .catch(error(res))

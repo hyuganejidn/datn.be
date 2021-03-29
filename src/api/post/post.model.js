@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import mongooseKeywords from 'mongoose-keywords'
+import { populatePost } from './post.constants'
 // import { populate } from './comment.constants'
 
 const classifies = ['forum', 'blog']
@@ -35,12 +36,21 @@ PostSchema.virtual('comments', {
   foreignField: 'post',
 })
 
+PostSchema.methods.populatePost = async function () {
+  return await this.populate(populatePost).execPopulate()
+}
+
+PostSchema.methods.view = function () {
+  const data = { ...this, avatar: uri + this.avatar }
+  return data
+}
+
 
 PostSchema.pre('remove', async function (next) {
   await this.model('Comment').remove({ post: this._id })
   await this.model('VotePost').remove({ post: this._id })
   await this.model('LikePost').remove({ post: this._id })
-next()
+  next()
 })
 // PostSchema.methods.populateComment = async function () {
 //   return await this.populate(populate).execPopulate()

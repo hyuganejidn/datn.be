@@ -23,7 +23,6 @@ export const create = async ({ body, user }, res) => {
   let data = { ...body, author: user.id }
   if (body.classify === 'forum' && body.topic) {
     const topic = await Topic.findOne({ slug: body.topic })
-    console.log(topic)
     data.topic = topic.id
   }
   if (body.classify === 'blog' && body.blog) {
@@ -37,16 +36,23 @@ export const create = async ({ body, user }, res) => {
     .catch(error(res))
 }
 
+export const update = async ({ params, body }, res) => {
+  let data = { ...body }
+  if (body.topic) {
+    const topic = await Topic.findOne({ slug: body.topic })
+    data.topic = topic._id
+  }
+  Post.findByIdAndUpdate(params.id, data, { new: true, })
+    .then(post => post.populatePost())
+    .then(success(res))
+    .catch(error(res))
+}
+
 export const show = ({ params }, res) =>
   Post.findById(params.id)
     .populate(populatePost)
     .then(notFound(res))
     .then(post => post.set({ viewNum: ++post.viewNum }).save())
-    .then(success(res))
-    .catch(error(res))
-
-export const update = async ({ params, body }, res) =>
-  Post.findByIdAndUpdate(params.id, body, { new: true, })
     .then(success(res))
     .catch(error(res))
 
@@ -83,3 +89,9 @@ export const likePost = ({ params, body, user }, res) =>
   handleLikePost(params.id, user.id)
     .then(success(res))
     .catch(error(res))
+
+export const deleteMany = (req, res) =>
+  Post.remove({})
+    .then(success(res, 204))
+    .catch(error(res))
+

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { middleware as query } from 'querymen'
 
-import { index, show, create, update, destroy, votePost, likePost, listComment, findPostsFollowed } from './post.controller'
+import { index, show, create, update, destroy, votePost, deleteMany, likePost, listComment, findPostsFollowed } from './post.controller'
 import { authenticate } from '../../middleware/authenticate'
 const router = new Router()
 
@@ -15,7 +15,8 @@ router.put('/:id/vote', authenticate(), votePost)
 router.put('/:id/like', authenticate(), likePost)
 
 router.post('/', authenticate(), create)
-router.delete('/:id', authenticate(['admin']), destroy)
+router.delete('/:id', authenticate(), destroy)
+router.delete('/', authenticate(['admin']), deleteMany)
 
 
 export default router

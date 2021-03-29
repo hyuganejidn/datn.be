@@ -34,13 +34,26 @@ export const updateMe = ({ params },) => {
 
 }
 
-export const updateInfo = ({ params, body, user }, res) => {
-  // const { id } = params
+export const updateInfo = ({ body, user }, res) => {
+  user.fullName = body.fullName
+  user.introduction = body.introduction
+  user.save()
+  res.status(201).json(user)
+}
+
+export const updateUserInfo = ({ params, body, user }, res) => {
   // const { fullName, avatarUrl } = body
   // User.findByIdAndUpdate(id, { fullName, avatarUrl }, { new: true, useFindAndModify: false })
   //   .then(user => res.status(200).json(user))
   //   .catch(err => res.status(404).json(err))
 }
+
+export const updateAvatar = ({ body, user }, res) => {
+  user.avatarUrl = body.avatarUrl
+  user.save()
+  res.status(201).json(user)
+}
+
 
 export const resetPassword = ({ params, body, user }, res) =>
   User.findById(params.id === 'me' ? user.id : params.id)
@@ -69,7 +82,7 @@ export const findCommentsVoted = ({ user, query }, res) =>
     .catch(error(res))
 
 export const findBlogs = ({ querymen, params, user }, res) =>
-  getBlogsOfUser(querymen, params.id === 'me' ? user.id : params.id)
+  getBlogsOfUser(querymen, user ? user.id : params.id)
     .then(success(res))
     .catch(error(res))
 
@@ -80,3 +93,8 @@ export const findPostsForum = ({ querymen: { query, select, cursor }, params, us
     .catch(error(res))
 
 
+export const handleBlock = ({ body, params }, res) =>
+  User.findByIdAndUpdate(params.id, { isBlock: body.isBlock })
+    .then(user => user.userPopulate())
+    .then(success(res))
+    .catch(error(res))

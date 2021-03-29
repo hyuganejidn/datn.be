@@ -103,9 +103,13 @@ export const getCommentsVoted = async (userId, postId, type) => {
       vote = await LikeComment.find({ user: userId }).populate('comment', 'post')
     }
 
+    console.log(vote)
+
     const voteCommentObj = vote
-      .filter(item => item.comment.post + "" === postId)
+      .filter(item => item.comment?.post + "" === postId)
       .reduce((cur, acc) => ({ ...cur, [acc.comment._id]: type === 'forum' ? acc.vote : 1 }), {})
+
+    console.log(voteCommentObj)
 
     return voteCommentObj
   } catch (error) {

@@ -74,3 +74,15 @@ export const handleLikeComment = async (commentId, userId) => {
   }
 }
 
+export const handleRemove = async (comment) => {
+  try {
+    const childrenId = comment.commentsChild.map(child => child.id)
+    await VoteComment.remove({ comment: { $in: childrenId } })
+    await LikeComment.remove({ comment: { $in: childrenId } })
+    await Post.updateOne({ _id: comment.post }, { $inc: { commentNum: -(1 + comment.commentsChild.length) } })
+    comment.remove()
+    return comment
+  } catch (error) {
+
+  }
+}

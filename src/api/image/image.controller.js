@@ -12,7 +12,7 @@ import { uri } from '../../configs/variables'
 //     .catch(error(res))
 
 export const create = ({ files }, res) => {
-  const paths = files.map(file => ({ path: uri + '/' + file.path }))
+  const paths = files.map(file => ({ path: '/' + file.path }))
   console.log(files)
   Image.insertMany(paths).then(success(res, 201)).catch(error(res))
 }

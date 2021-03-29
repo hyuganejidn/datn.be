@@ -19,4 +19,3 @@ router.use('/comments', commentApi)
 router.use('/images', imageApi)
 
 export default router
-

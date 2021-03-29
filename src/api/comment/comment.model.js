@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { remove } from 'winston'
 import { populateComment } from './comment.constants'
 
 const CommentSchema = mongoose.Schema(
@@ -36,8 +37,8 @@ CommentSchema.methods.populateComment = async function () {
 
 CommentSchema.pre('remove', async function (next) {
   await this.model('VoteComment').remove({ comment: this._id })
+  await this.model('LikeComment').remove({ comment: this._id })
   await this.model('Comment').remove({ commentParent: this._id })
-  await this.model('Post').updateOne({ _id: this.post }, { $inc: { commentNum: -1 } })
   next()
 })
 

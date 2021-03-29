@@ -8,8 +8,10 @@ const roles = ['user', 'admin']
 const UserSchema = mongoose.Schema({
   username: { type: String, require: true, trim: true, unique: true, lowercase: true, },
   fullName: { type: String, require: true },
+  introduction: { type: String, default: "" },
   password: { type: String, require: true, trim: true, minLength: MIN_PASSWORD, maxLength: MAX_PASSWORD },
   role: { type: String, enum: roles, default: 'user' },
+  isBlock: { type: String, default: false },
   avatarUrl: { type: String, default: '' },
   blogsFollowing: [{ type: mongoose.Types.ObjectId, ref: 'Blog' }],
 }, {
