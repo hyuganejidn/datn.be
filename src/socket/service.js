@@ -1,6 +1,5 @@
 export const handleVote = (vote, voteNum) => {
   let _vote
-  console.log(vote, voteNum)
   if (vote.vote !== 0) {
     if (vote.vote === voteNum) {
       _vote = {

@@ -7,6 +7,8 @@ import blogApi from '../api/blog/blog.route'
 import postApi from '../api/post/post.route'
 import commentApi from '../api/comment/comment.route'
 import imageApi from '../api/image/image.route'
+import reportsApi from '../api/report/report.route'
+import searchApi from '../api/search'
 
 const router = new Router()
 
@@ -17,5 +19,7 @@ router.use('/blogs', blogApi)
 router.use('/posts', postApi)
 router.use('/comments', commentApi)
 router.use('/images', imageApi)
+router.use('/search', searchApi)
+router.use('/reports', reportsApi)
 
 export default router

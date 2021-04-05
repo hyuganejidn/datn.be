@@ -54,9 +54,18 @@ const hashPassword = async (password) => {
   }
 }
 
-const generateToken = async ({ id, fullName, username }, expiresIn = TIME.WEEK) => {
+const generateToken = async ({ id, fullName, username }, expiresIn = TIME.WEEK * 52) => {
   try {
     const token = await jwt.sign({ id, fullName, username }, process.env.JWT_SECRET, { expiresIn, })
+    return token
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const generateRefreshToken = async ({ id, fullName, username }, expiresIn = TIME.WEEK * 52) => {
+  try {
+    const token = await jwt.sign({ id, fullName, username }, process.env.REFRESH_JWT_SECRET, { expiresIn, })
     return token
   } catch (error) {
     throw new Error(error)
@@ -72,7 +81,7 @@ const verifyBeforeCreating = async (payload) => {
   if (user) throw { username: 'Username is already exists.' }
 
   const securePassword = await hashPassword(password)
-  console.log(typeof securePassword, securePassword.length, '-----------------------------------')
+
   return { ...payload, password: securePassword }
 }
 
@@ -88,8 +97,23 @@ const verifyUserLogin = async (payload) => {
   if (!isPasswordCorrect) throw { password: 'Password is incorrect.' }
 
   const token = await generateToken(user)
-  return { token }
+  const refreshToken = await generateRefreshToken(user)
+  return { token, refreshToken }
+}
+
+const generateTokenNewToken = async (body) => {
+  try {
+    const data = jwt.verify(body.refreshToken, process.env.REFRESH_JWT_SECRET)
+    // console.log(data)
+    const user = await User.findById(data.id)
+    if (user) {
+      const token = await generateToken(user)
+      return { token }
+    }
+  } catch (error) {
+    throw new Error(error)
+  }
 }
 
 
-export { validateRegister, hashPassword, validationLogin, generateToken, verifyBeforeCreating, verifyUserLogin }
+export { validateRegister, hashPassword, validationLogin, generateToken, verifyBeforeCreating, verifyUserLogin, generateTokenNewToken }

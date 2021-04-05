@@ -1,4 +1,5 @@
 import { populateComment } from "../comment/comment.constants";
+import { populateReport } from "../report/report.constants";
 
 export const populatePost = [
   {
@@ -19,9 +20,16 @@ export const populatePost = [
     path: 'topic',
     select: ['name', 'slug'],
   },
+  {
+    path: 'reports',
+    select: ['reason', 'userReport', 'value'],
+    populate: populateReport
+  }
 ]
 
-export const populatePostComment = [...populatePost, {
+export const populatePostComment = [...populatePost,
+{
   path: 'comments',
   populate: populateComment
-}]
+},
+]

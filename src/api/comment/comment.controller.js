@@ -5,7 +5,7 @@ import { error, notFound, success } from '../../helpers/api'
 import { createComment, handleLikeComment, handleRemove, handleVoteComment } from './comment.service'
 
 export const index = (req, res) =>
-  Comment.find({ commentParent: null, userBeingReply: null })
+  Comment.find({ commentParent: null, userBeingReply: null, isBlock: false })
     .populate(populateComment)
     .then(comments => ({ data: comments }))
     .then(success(res))

@@ -1,4 +1,4 @@
-export const populateUser = (type = 'forum') => [
+export const populateUser = [
   {
     path: 'votePosts',
     select: ['vote', 'post'],

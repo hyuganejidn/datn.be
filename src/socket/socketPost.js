@@ -2,28 +2,29 @@ import { handleLike, handleVote } from "./service";
 
 export const socketPost = (channel) => channel.on("connection", (socket) => {
   socket.emit("test", socket.id);
-  socket.on("JoiningRoom", (post) => {
-    const room = post.id
+  socket.on("JoiningRoom", (id) => {
+    const room = id
     socket.join(room)
     socket.room = room
     socket.to(room).emit('JoiningRoom', { status: 'Joined' });
   });
 
-  socket.on('VotePost', ({ voteNum, vote }) => {
-    const _vote = handleVote(vote, voteNum)
-    socket.to(socket.room).emit('VotePost', { _vote })
+  socket.on('VotePost', ({ vote, postId, userId }) => {
+    // const _vote = handleVote(vote, voteNum)
+    console.log(vote, postId, userId)
+    socket.to(socket.room).emit('VotePost', { vote, postId, userId })
   })
 
-  socket.on('LikePost', vote => {
-    socket.to(socket.room).emit('LikePost', vote)
+  socket.on('LikePost', ({ vote: _vote, userId: _userId }) => {
+    socket.to(socket.room).emit('LikePost', { _vote, _userId })
   })
 
   socket.on('UpdatePost', post => {
     socket.to(socket.room).emit('UpdatePost', post)
   })
 
-  socket.on('LikeComment', ({ vote: _vote, commentId: _commentId }) => {
-    socket.to(socket.room).emit('LikeComment', { _vote, _commentId })
+  socket.on('LikeComment', ({ vote: _vote, commentId: _commentId, userId: _userId }) => {
+    socket.to(socket.room).emit('LikeComment', { _vote, _commentId, _userId })
   })
 
   socket.on('Comment', data => {
@@ -40,11 +41,12 @@ export const socketPost = (channel) => channel.on("connection", (socket) => {
     socket.to(socket.room).emit('UpdateComment', { comment, content })
   })
 
-  socket.on('VoteComment', ({ voteNum, vote, commentId }) => {
-    const _vote = handleVote(vote, voteNum)
+  socket.on('VoteComment', ({ vote, commentId, userId }) => {
+    // const _vote = handleVote(vote, voteNum)
     socket.to(socket.room).emit('VoteComment', {
-      _vote,
+      _vote: vote,
       _commentId: commentId,
+      _userId: userId
     })
   })
 

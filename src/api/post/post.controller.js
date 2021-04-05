@@ -8,7 +8,9 @@ import { populatePost, populatePostComment } from './post.constants'
 import { handleVotePost, handleUpPostNumber, handleLikePost } from './post.service'
 import { populateComment } from '../comment/comment.constants'
 
-export const index = async ({ querymen: { query, select, cursor }, params }, res) =>
+export const index = async ({ querymen: { query, select, cursor }, params }, res) => {
+  query.isBlock = params.isBlock || false
+  console.log( query, select, cursor)
   Post.find(query, select, cursor)
     .populate(populatePost)
     .then(async post => {
@@ -17,7 +19,7 @@ export const index = async ({ querymen: { query, select, cursor }, params }, res
     })
     .then(success(res))
     .catch(error(res))
-
+}
 
 export const create = async ({ body, user }, res) => {
   let data = { ...body, author: user.id }

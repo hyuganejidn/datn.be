@@ -1,7 +1,7 @@
 import { User } from '../user/user.model'
 
 import { error, success } from '../../helpers/api'
-import { verifyBeforeCreating, verifyUserLogin } from './auth.service'
+import { verifyBeforeCreating, verifyUserLogin, generateTokenNewToken } from './auth.service'
 
 const register = ({ body }, res) =>
   verifyBeforeCreating(body)
@@ -14,5 +14,9 @@ const login = ({ body }, res) =>
     .then(success(res, 201))
     .catch(error(res))
 
+const refreshToken = ({ body }, res) =>
+  generateTokenNewToken(body)
+    .then(success(res, 201))
+    .catch(error(res))
 
-export { register, login }
+export { register, login, refreshToken }

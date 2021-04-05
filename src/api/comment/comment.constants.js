@@ -13,7 +13,8 @@ export const _populateComment = [
   }
 ]
 
-export const populateComment = [..._populateComment, {
+export const populateComment = [..._populateComment,
+{
   path: 'commentsChild',
   populate: [
     {
@@ -29,4 +30,9 @@ export const populateComment = [..._populateComment, {
       select: ['fullName']
     },
   ]
-},]
+},
+{
+  path: 'reports',
+  select: ['reason', 'userReport', 'value']
+}
+]

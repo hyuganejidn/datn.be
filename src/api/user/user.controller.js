@@ -2,13 +2,16 @@
 import { User, VotePost } from './user.model'
 import Blog from '../blog/blog.model'
 import Post from '../post/post.model'
+import Report from '../report/report.model'
+import Comment from '../comment/comment.model'
 
 import { error, notFound, success } from '../../helpers/api'
 import { verifyResetPassword, getPostsVoted, getCommentsVoted, handleFollowerBlog, getBlogsOfUser } from './user.service'
 import { populateUser } from './user.constants'
 import { populatePost } from '../post/post.constants'
 
-export const index = ({ querymen: { query, select, cursor } }, res) =>
+export const index = ({ querymen: { query, select, cursor } }, res) => {
+  query.isBlock = false
   User.find(query, select, cursor)
     // .populate(populateUser)
     .then(async users => {
@@ -17,12 +20,12 @@ export const index = ({ querymen: { query, select, cursor } }, res) =>
     })
     .then(success(res))
     .catch(error(res))
-
+}
 
 
 export const showInfo = ({ params }, res) =>
   User.findById(params.id)
-    .populate(populateUser())
+    .populate(populateUser)
     .then(notFound(res))
     // .then(async user => await user.userPopulate())
     .then(success(res))
@@ -59,7 +62,7 @@ export const resetPassword = ({ params, body, user }, res) =>
   User.findById(params.id === 'me' ? user.id : params.id)
     .then(notFound(res))
     .then((result) => verifyResetPassword(body, result, user))
-    .then(({ user, new_password }) => user.set({ password: new_password }).save())
+    .then(({ user, password }) => user.set({ password }).save())
     .then(success(res))
     .catch(error(res))
 
@@ -92,9 +95,25 @@ export const findPostsForum = ({ querymen: { query, select, cursor }, params, us
     .then(success(res))
     .catch(error(res))
 
-
-export const handleBlock = ({ body, params }, res) =>
-  User.findByIdAndUpdate(params.id, { isBlock: body.isBlock })
+export const shouldBlockUser = ({ body: { userId, isBlock } }, res) =>
+  User.findByIdAndUpdate(userId, { isBlock })
     .then(user => user.userPopulate())
     .then(success(res))
+    .catch(error(res))
+
+export const reportPost = ({ body: { reason, postId, commentId, type, status, value }, user }, res) => {
+  const data = { reason, status, value, type, post: postId, comment: commentId, userReport: user.id }
+  Report.create(data)
+    .then(success(res, 201))
+    .catch(error(res))
+}
+
+export const shouldBlockPost = ({ body: { postId, isBlock }, }, res) =>
+  Post.findByIdAndUpdate(postId, { isBlock })
+    .then(success(res, 200))
+    .catch(error(res))
+
+export const shouldBlockComment = ({ body: { commentId, isBlock }, }, res) =>
+  Comment.findByIdAndUpdate(commentId, { isBlock })
+    .then(success(res, 200))
     .catch(error(res))

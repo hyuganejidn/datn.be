@@ -52,6 +52,6 @@ BlogSchema.methods.populateBlog = async function () {
   return await this.populate(populateBlog).execPopulate()
 }
 
-BlogSchema.plugin(mongooseKeywords, { paths: ['title', 'slug'] })
+BlogSchema.plugin(mongooseKeywords, { paths: ['title', 'slug', 'description'] })
 const model = mongoose.model('Blog', BlogSchema)
 export default model

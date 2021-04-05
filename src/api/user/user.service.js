@@ -8,7 +8,7 @@ import { VoteComment, VotePost, LikePost, LikeComment } from './user.model'
 import { populateBlog } from '../blog/blog.constants'
 
 export const verifyResetPassword = async (payload, data, user) => {
-  const { new_password, new_passwordConfirm, password } = payload
+  const { passwordNew, passwordConfirm, password } = payload
 
   const isSelfUpdate = user.role === 'user' && user.id !== data.id
   if (isSelfUpdate) throw {
@@ -20,35 +20,35 @@ export const verifyResetPassword = async (payload, data, user) => {
   const isPasswordCorrect = await bcryptjs.compare(password, data.password)
   if (!isPasswordCorrect) throw { password: 'Password is incorrect.' }
 
-  const errors = verifyNewPassword(password, new_password, new_passwordConfirm)
+  const errors = verifyNewPassword(password, passwordNew, passwordConfirm)
   if (Object.keys(errors).length) throw errors
 
-  const securePassword = await hashPassword(new_password)
+  const securePassword = await hashPassword(passwordNew)
   return {
     user: data,
-    new_password: securePassword
+    password: securePassword
   }
 }
 
-export const verifyNewPassword = (password, new_password, new_passwordConfirm) => {
+export const verifyNewPassword = (password, passwordNew, passwordConfirm) => {
   const errors = {}
-  if (!new_password) {
-    errors.new_password = 'New password field is required.'
+  if (!passwordNew) {
+    errors.passwordNew = 'New password field is required.'
   }
   else {
-    if (new_password === password) {
-      errors.new_password = 'New password is the same as current password.'
+    if (passwordNew === password) {
+      errors.passwordNew = 'New password is the same as current password.'
     }
-    const isEnoughLength = validator.isLength(new_password, {
+    const isEnoughLength = validator.isLength(passwordNew, {
       min: MIN_PASSWORD,
       max: MAX_PASSWORD,
     })
     if (!isEnoughLength) {
-      errors.new_password = `Password need at least ${MIN_PASSWORD} character and less than ${MAX_PASSWORD} character`
+      errors.passwordNew = `Password need at least ${MIN_PASSWORD} character and less than ${MAX_PASSWORD} character`
     }
   }
-  if (!new_passwordConfirm || !validator.equals(new_passwordConfirm, new_password)) {
-    errors.new_passwordConfirm = 'New password confirm is not match.'
+  if (!passwordConfirm || !validator.equals(passwordConfirm, passwordNew)) {
+    errors.passwordConfirm = 'New password confirm is not match.'
   }
 
   return errors
@@ -103,13 +103,9 @@ export const getCommentsVoted = async (userId, postId, type) => {
       vote = await LikeComment.find({ user: userId }).populate('comment', 'post')
     }
 
-    console.log(vote)
-
     const voteCommentObj = vote
       .filter(item => item.comment?.post + "" === postId)
       .reduce((cur, acc) => ({ ...cur, [acc.comment._id]: type === 'forum' ? acc.vote : 1 }), {})
-
-    console.log(voteCommentObj)
 
     return voteCommentObj
   } catch (error) {
@@ -119,7 +115,7 @@ export const getCommentsVoted = async (userId, postId, type) => {
 
 export const getBlogsOfUser = async ({ query, select, cursor }, userId) => {
   try {
-    console.log({ ...query, author: userId })
+    // console.log({ ...query, author: userId })
     const blogs = await Blog.find({ ...query, author: userId }, select, cursor).populate(populateBlog)
     const total = await Blog.countDocuments({ ...query, author: userId }).exec()
 

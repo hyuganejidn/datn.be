@@ -10,6 +10,7 @@ const CommentSchema = mongoose.Schema(
     userBeingReply: { type: mongoose.Types.ObjectId, default: null, ref: 'User' },
     content: { type: String, required: true },
     voteNum: { type: Number, default: 0 },
+    isBlock: { type: Boolean, default: false}
   },
   {
     timestamps: true,
@@ -29,6 +30,12 @@ CommentSchema.virtual('commentsChild', {
   ref: 'Comment',
   localField: '_id',
   foreignField: 'commentParent',
+})
+
+CommentSchema.virtual('reports', {
+  ref: 'Report',
+  localField: '_id',
+  foreignField: 'comment',
 })
 
 CommentSchema.methods.populateComment = async function () {

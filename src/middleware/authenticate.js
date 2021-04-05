@@ -4,8 +4,10 @@ import passportJwt from "../configs/passport";
 
 export const authenticate = (roles = ['user', 'admin']) => (req, res, next) =>
   passportJwt.authenticate('jwt', { session: false }, (err, user, info) => {
-    if (err) return res.status(401).end()
-    if (!user) throw Error('Invalid token, please log in or sign up')
+    if (err) return res.status(401).json(err)
+    if (info) return res.status(401).json(info)
+    if (!user) throw res.status(401).json(err)
+    // console.log(user, info)
     if (!roles.includes(user.role)) return res.status(401).end()
 
     req.user = user

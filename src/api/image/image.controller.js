@@ -13,7 +13,7 @@ import { uri } from '../../configs/variables'
 
 export const create = ({ files }, res) => {
   const paths = files.map(file => ({ path: '/' + file.path }))
-  console.log(files)
+  // console.log(files)
   Image.insertMany(paths).then(success(res, 201)).catch(error(res))
 }
   // Topic.create(body).then(success(res, 201)).catch(error(res));

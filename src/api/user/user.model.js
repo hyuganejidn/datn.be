@@ -11,7 +11,7 @@ const UserSchema = mongoose.Schema({
   introduction: { type: String, default: "" },
   password: { type: String, require: true, trim: true, minLength: MIN_PASSWORD, maxLength: MAX_PASSWORD },
   role: { type: String, enum: roles, default: 'user' },
-  isBlock: { type: String, default: false },
+  isBlock: { type: Boolean, default: false },
   avatarUrl: { type: String, default: '' },
   blogsFollowing: [{ type: mongoose.Types.ObjectId, ref: 'Blog' }],
 }, {
@@ -39,8 +39,8 @@ UserSchema.virtual('voteComments', {
   foreignField: 'user',
 })
 
-UserSchema.methods.userPopulate = async function (type) {
-  return await this.populate(populateUser(type)).execPopulate()
+UserSchema.methods.userPopulate = async function () {
+  return await this.populate(populateUser).execPopulate()
 }
 
 UserSchema.static = { roles }
