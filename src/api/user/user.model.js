@@ -45,7 +45,7 @@ UserSchema.methods.userPopulate = async function () {
 
 UserSchema.static = { roles }
 
-UserSchema.plugin(mongooseKeywords, { paths: ['fullName', 'username'] })
+UserSchema.plugin(mongooseKeywords, { paths: ['fullName', 'username', 'introduction'] })
 
 const eVote = [-1, 1]
 const VoteCommentSchema = mongoose.Schema({

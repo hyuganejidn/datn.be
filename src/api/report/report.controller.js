@@ -25,3 +25,10 @@ export const destroy = ({ params }, res) =>
     .then((report) => report.remove())
     .then(success(res, 204))
     .catch(error(res))
+
+export const destroyMany = ({ body }, res) => {
+  console.log(body.ids, '123123')
+  Report.deleteMany({ _id: { $in: body.ids } })
+    .then(success(res, 204))
+    .catch(error(res))
+}

@@ -10,8 +10,7 @@ import { verifyResetPassword, getPostsVoted, getCommentsVoted, handleFollowerBlo
 import { populateUser } from './user.constants'
 import { populatePost } from '../post/post.constants'
 
-export const index = ({ querymen: { query, select, cursor } }, res) => {
-  query.isBlock = false
+export const index = ({ querymen: { query, select, cursor } }, res) =>
   User.find(query, select, cursor)
     // .populate(populateUser)
     .then(async users => {
@@ -20,7 +19,7 @@ export const index = ({ querymen: { query, select, cursor } }, res) => {
     })
     .then(success(res))
     .catch(error(res))
-}
+
 
 
 export const showInfo = ({ params }, res) =>
@@ -101,11 +100,26 @@ export const shouldBlockUser = ({ body: { userId, isBlock } }, res) =>
     .then(success(res))
     .catch(error(res))
 
-export const reportPost = ({ body: { reason, postId, commentId, type, status, value }, user }, res) => {
-  const data = { reason, status, value, type, post: postId, comment: commentId, userReport: user.id }
-  Report.create(data)
-    .then(success(res, 201))
-    .catch(error(res))
+export const reportPost = async ({ body: { reason, postId, commentId, type, value }, user }, res) => {
+  const data = {
+    type,
+    post: postId,
+    comment: commentId,
+    reports: [{ reason, value, userReport: user.id, createdAt: new Date() }]
+  }
+  const query = commentId ? { comment: commentId } : { post: postId }
+  const report = await Report.findOne(query)
+  if (report) {
+    report.reports.push({ reason, value, userReport: user.id })
+    report.save()
+    success(res, 201)(report)
+  }
+  else {
+    Report.create(data)
+      .then(success(res, 201))
+      .catch(error(res))
+  }
+
 }
 
 export const shouldBlockPost = ({ body: { postId, isBlock }, }, res) =>

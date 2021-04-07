@@ -10,7 +10,7 @@ import { populateComment } from '../comment/comment.constants'
 
 export const index = async ({ querymen: { query, select, cursor }, params }, res) => {
   query.isBlock = params.isBlock || false
-  console.log( query, select, cursor)
+  console.log(query, select, cursor)
   Post.find(query, select, cursor)
     .populate(populatePost)
     .then(async post => {
@@ -66,8 +66,14 @@ export const destroy = ({ params }, res) =>
     .catch(error(res))
 
 export const listComment = ({ params }, res) =>
-  Comment.find({ commentParent: null, userBeingReply: null, post: params.id })
+  Comment.find({ commentParent: null, userBeingReply: null, post: params.id, isBlock: false })
     .populate(populateComment)
+    .then(comments => {
+      comments.forEach(comment => {
+        comment.commentsChild = comment.commentsChild.filter(child => !child.isBlock)
+      })
+      return comments
+    })
     .then(comments => ({ data: comments }))
     .then(success(res))
     .catch(error(res))

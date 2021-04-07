@@ -1,11 +1,8 @@
 export const populateReport = [
-  {
-    path: 'userReport',
-    select: ['fullName', 'username', 'avatarUrl', 'role'],
-  },
+
   {
     path: 'post',
-    select: ['title', 'content'],
+    select: ['title', 'content', 'classify', 'isBlock'],
     populate: [
       {
         path: 'author',
@@ -14,12 +11,31 @@ export const populateReport = [
     ]
   },
   {
+    path: 'reports',
+    populate: [
+      {
+        path: 'userReport',
+        select: ['fullName', 'username', 'avatarUrl', 'role'],
+      },
+    ]
+  },
+  {
     path: 'comment',
-    select: ['content'],
+    select: ['content', 'post', 'isBlock'],
     populate: [
       {
         path: 'author',
         select: ['fullName', 'username', 'avatarUrl', 'role'],
+      },
+      {
+        path: 'post',
+        select: ['title', 'content', 'classify'],
+        populate: [
+          {
+            path: 'author',
+            select: ['fullName', 'username', 'avatarUrl', 'role'],
+          }
+        ]
       }
     ]
   }
