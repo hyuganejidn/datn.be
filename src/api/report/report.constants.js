@@ -2,7 +2,7 @@ export const populateReport = [
 
   {
     path: 'post',
-    select: ['title', 'content', 'classify', 'isBlock'],
+    select: ['title', 'classify', 'isBlock'],
     populate: [
       {
         path: 'author',
@@ -29,7 +29,7 @@ export const populateReport = [
       },
       {
         path: 'post',
-        select: ['title', 'content', 'classify'],
+        select: ['title', 'classify'],
         populate: [
           {
             path: 'author',

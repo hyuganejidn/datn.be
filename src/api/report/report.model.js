@@ -23,7 +23,7 @@ const ReportSchema = mongoose.Schema(
       virtuals: true,
       transform: (obj, ret) => {
         delete ret._id
-        delete ret.keywords
+        // delete ret.keywords
       }
     }
   }
@@ -34,6 +34,15 @@ ReportSchema.methods.populateReport = async function () {
 }
 
 
-ReportSchema.plugin(mongooseKeywords, { paths: ['reports'] })
+ReportSchema.plugin(mongooseKeywords, {
+  paths: ['reports', 'type', 'post'],
+  transform: value => {
+    if (typeof value == "object") {
+      if (value.hasOwnProperty("reason"))
+        return value.reason;
+    }
+    return value;
+  }
+})
 const model = mongoose.model('Report', ReportSchema)
 export default model
