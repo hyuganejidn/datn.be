@@ -104,7 +104,6 @@ const verifyUserLogin = async (payload) => {
 const generateTokenNewToken = async (body) => {
   try {
     const data = jwt.verify(body.refreshToken, process.env.REFRESH_JWT_SECRET)
-    // console.log(data)
     const user = await User.findById(data.id)
     if (user) {
       const token = await generateToken(user)

@@ -115,7 +115,6 @@ export const getCommentsVoted = async (userId, postId, type) => {
 
 export const getBlogsOfUser = async ({ query, select, cursor }, userId) => {
   try {
-    // console.log({ ...query, author: userId })
     const blogs = await Blog.find({ ...query, author: userId }, select, cursor).populate(populateBlog)
     const total = await Blog.countDocuments({ ...query, author: userId }).exec()
 

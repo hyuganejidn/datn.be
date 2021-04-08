@@ -35,14 +35,7 @@ ReportSchema.methods.populateReport = async function () {
 
 
 ReportSchema.plugin(mongooseKeywords, {
-  paths: ['reports', 'type', 'post'],
-  transform: value => {
-    if (typeof value == "object") {
-      if (value.hasOwnProperty("reason"))
-        return value.reason;
-    }
-    return value;
-  }
+  paths: ['type'],
 })
 const model = mongoose.model('Report', ReportSchema)
 export default model

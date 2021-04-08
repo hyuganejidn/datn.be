@@ -20,12 +20,10 @@ export const socketHome = (channel) => channel.on("connection", (socket) => {
   })
 
   socket.on('Comment', data => {
-    console.log(data)
     socket.to(socket.room).emit('Comment', data)
   })
 
   socket.on('DeleteComment', data => {
-    console.log(data)
     socket.to(socket.room).emit('DeleteComment', data)
   })
 
@@ -39,7 +37,6 @@ export const socketHome = (channel) => channel.on("connection", (socket) => {
   })
 
   socket.on('LeavingRoom', () => {
-    socket.leave(socket.room);
     console.log('\n@@@ LEAVING_ROOM leaving ', socket.room ? socket.room : 'EMPTY')
   });
 
@@ -48,7 +45,6 @@ export const socketHome = (channel) => channel.on("connection", (socket) => {
   })
 
   socket.on('disconnect', reason => {
-    console.log(reason)
     socket.to(socket.room).emit('LeavedRoom', socket.id);
     socket.leave(socket.room);
     // console.log(`\n@ DISCONNECTED ${socket.id} in room ${socket.room} reason ${reason}`);

@@ -11,7 +11,6 @@ export const socketPost = (channel) => channel.on("connection", (socket) => {
 
   socket.on('VotePost', ({ vote, postId, userId }) => {
     // const _vote = handleVote(vote, voteNum)
-    console.log(vote, postId, userId)
     socket.to(socket.room).emit('VotePost', { vote, postId, userId })
   })
 
@@ -28,12 +27,10 @@ export const socketPost = (channel) => channel.on("connection", (socket) => {
   })
 
   socket.on('Comment', data => {
-    console.log(data)
     socket.to(socket.room).emit('Comment', data)
   })
 
   socket.on('DeleteComment', data => {
-    console.log(data)
     socket.to(socket.room).emit('DeleteComment', data)
   })
 
@@ -65,7 +62,6 @@ export const socketPost = (channel) => channel.on("connection", (socket) => {
   })
 
   socket.on('disconnect', reason => {
-    console.log(reason)
     socket.to(socket.room).emit('LeavedRoom', socket.id);
     socket.leave(socket.room);
     // console.log(`\n@ DISCONNECTED ${socket.id} in room ${socket.room} reason ${reason}`);

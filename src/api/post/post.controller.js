@@ -10,7 +10,6 @@ import { populateComment } from '../comment/comment.constants'
 
 export const index = async ({ querymen: { query, select, cursor }, params }, res) => {
   query.isBlock = params.isBlock || false
-  console.log(query, select, cursor)
   Post.find(query, select, cursor)
     .populate(populatePost)
     .then(async post => {
