@@ -57,6 +57,7 @@ PostSchema.pre('remove', async function (next) {
   await this.model('Comment').remove({ post: this._id })
   await this.model('VotePost').remove({ post: this._id })
   await this.model('LikePost').remove({ post: this._id })
+  await this.model('Report').remove({ post: this._id })
   next()
 })
 // PostSchema.methods.populateComment = async function () {
