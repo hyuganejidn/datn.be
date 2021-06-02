@@ -1,4 +1,4 @@
-#### Do please below step after you checkout the repo
+#### Do please below step after you checkout the repotest
 
 1. Copy file .env.example to .env.
 2. Config .env to be fit with the environment that using for the project.
